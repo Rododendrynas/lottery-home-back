@@ -59,7 +59,7 @@ router.put('/account/:id', async (req, res) => {
 
     await con.execute(sql, [nickname, id]);
 
-    return res.status(200).send({ msg: 'Nickname was updated' });
+    return res.status(200).send({ msg: `Nickname was updated to ${nickname}` });
   } catch (err) {
     return res
       .status(500)

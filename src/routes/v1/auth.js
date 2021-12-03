@@ -10,7 +10,13 @@ const { dbConfig, jwtSecret } = require('../../config');
 const router = express.Router();
 
 // Validation of user registration and login data
-const userSchema = Joi.object({
+const regUserSchema = Joi.object({
+  nickname: Joi.string().required(),
+  email: Joi.string().email().trim().lowercase().required(),
+  password: Joi.string().required(),
+});
+
+const logUserSchema = Joi.object({
   email: Joi.string().email().trim().lowercase().required(),
   password: Joi.string().required(),
 });
@@ -19,7 +25,7 @@ const userSchema = Joi.object({
 router.post('/register', async (req, res) => {
   let userDetails = req.body;
   try {
-    userDetails = await userSchema.validateAsync(userDetails);
+    userDetails = await regUserSchema.validateAsync(userDetails);
   } catch (err) {
     console.log(err);
     return res.status(400).send({ err: 'Incorrect data.' });
@@ -30,15 +36,17 @@ router.post('/register', async (req, res) => {
     const con = await mysql.createConnection(dbConfig);
 
     const [data] = await con.execute(`
-        INSERT INTO users (email, password)
-        VALUES (${mysql.escape(userDetails.name)}, 
+        INSERT INTO users (nickname, email, password)
+        VALUES (${mysql.escape(userDetails.nickname)}, 
         ${mysql.escape(userDetails.email)}, '${hashedPassword}')
     `);
     await con.end();
-    return res.status(200).send(data, { msg: 'Registered' });
+    return res.status(200).send({ ...data, msg: 'Registered' });
   } catch (err) {
     console.log(err);
-    return res.status(500).send({ err: 'Issue. Try again' });
+    return res
+      .status(500)
+      .send({ err: 'Issue during registration. Try again' });
   }
 });
 
@@ -47,7 +55,7 @@ router.post('/login', async (req, res) => {
   let userDetails = req.body;
 
   try {
-    userDetails = await userSchema.validateAsync(userDetails);
+    userDetails = await logUserSchema.validateAsync(userDetails);
   } catch (err) {
     console.log(err);
     return res.status(400).send({ err: 'Incorrect email or password' });
@@ -73,11 +81,11 @@ router.post('/login', async (req, res) => {
     );
 
     if (!isAuthorized) {
-      return res.status(400).send({ err: 'Incorrect email or password' });
+      return res.status(401).send({ err: 'Incorrect email or password' });
     }
 
     const token = jwt.sign({ id: data[0].id, email: data[0].email }, jwtSecret);
-    return res.send({ msg: 'Successfully logged in', token });
+    return res.status(201).send({ msg: 'Successfully logged in', token });
   } catch (err) {
     return res.status(500).send({ err: 'Incorrect data. Try again' });
   }

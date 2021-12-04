@@ -24,6 +24,7 @@ const logUserSchema = Joi.object({
 // Register
 router.post('/register', async (req, res) => {
   let userDetails = req.body;
+  console.log(userDetails);
   try {
     userDetails = await regUserSchema.validateAsync(userDetails);
   } catch (err) {
@@ -41,6 +42,7 @@ router.post('/register', async (req, res) => {
         ${mysql.escape(userDetails.email)}, '${hashedPassword}')
     `);
     await con.end();
+    console.log(data);
     return res.status(200).send({ ...data, msg: 'Registered' });
   } catch (err) {
     console.log(err);

@@ -4,34 +4,78 @@ const Joi = require('joi');
 const { dbConfig } = require('../../config');
 
 const router = express.Router();
+const { isLoggedIn } = require('../../middleware');
 
-// Validation of user registration and login data
+// User input data validation for nickname change
 const nicknameSchema = Joi.object({
   nickname: Joi.string().min(3).max(10).required(),
 });
 
-const { isLoggedIn } = require('../../middleware');
+// Generate random lucky numbers
+router.get('/dice/:num', isLoggedIn, async (req, res) => {
+  const { num } = req.params;
 
-// Generate dice result
-router.get('/dice/', isLoggedIn, async (req, res) => {
+  // Create random numbers
+  const numbers = [];
   try {
-    const numbers = [
-      Math.floor(Math.random() * 6) + 1,
-      Math.floor(Math.random() * 6) + 1,
-      Math.floor(Math.random() * 6) + 1,
-    ];
+    // eslint-disable-next-line no-plusplus
+    for (let i = 0; i < num; i++) {
+      numbers.push(Math.floor(Math.random() * 6) + 1);
+    }
+    console.log(numbers);
 
-    // const isWinner = numbers.every((val, i, arr) => val === arr[0]);
-    const isWinner = numbers[0] === numbers[1] && numbers[0] === numbers[2];
+    const isWinner = numbers.every((val, i, arr) => val === arr[0]);
+    // const isWinner = numbers[0] === numbers[1] && numbers[0] === numbers[2];
 
     return res.status(200).send({ isWinner, numbers });
-  } catch (err) {
+  } catch (error) {
     return res
       .status(500)
-      .send({ err: 'Issue by rolling dice. Try again', e: err });
+      .send({ error: 'Issue by getting random numbers. Try again', e: error });
   }
 });
 
+// Save user given numbers
+router.put('/pingpong/:id', isLoggedIn, async (req, res) => {
+  const { id } = req.params;
+  const { numbers } = req.body;
+
+  console.log(numbers);
+
+  try {
+    const sql = 'INSERT INTO lucky_numbers (user_id, numbers) VALUES (?, ?)';
+    const con = await mysql.createConnection(dbConfig);
+    await con.execute(sql, [id, numbers]);
+    await con.end();
+
+    return res.status(200).send({ msg: 'Your lucky numbers were saved' });
+  } catch (error) {
+    return res.status(500).send({
+      error: 'Issue by saving your lucky numbers. Try again.',
+      e: error,
+    });
+  }
+});
+
+// Get user lucky numbers
+router.get('/pingpong/:id', isLoggedIn, async (req, res) => {
+  try {
+    const { id } = req.params;
+    const sql = 'SELECT numbers FROM lucky_numbers WHERE id = ?';
+
+    const con = await mysql.createConnection(dbConfig);
+    const [rows] = await con.execute(sql, [id]);
+    await con.end();
+
+    return res.status(200).send(rows[0]);
+  } catch (error) {
+    return res
+      .status(500)
+      .send({ error: 'Issue by getting your nickname. Try again', e: error });
+  }
+});
+
+// Delete user
 router.delete('/account/:id', isLoggedIn, async (req, res) => {
   try {
     const { id } = req.params;
@@ -42,10 +86,10 @@ router.delete('/account/:id', isLoggedIn, async (req, res) => {
     await con.end();
 
     return res.status(200).send({ msg: 'Deleted' });
-  } catch (err) {
+  } catch (error) {
     return res
       .status(500)
-      .send({ err: 'Issue by deleting account. Try again', e: err });
+      .send({ error: 'Issue by deleting account. Try again', e: error });
   }
 });
 
@@ -90,14 +134,14 @@ router.get('/account/:id', isLoggedIn, async (req, res) => {
     await con.end();
 
     return res.status(200).send(rows[0]);
-  } catch (err) {
+  } catch (error) {
     return res
       .status(500)
-      .send({ err: 'Issue by getting your nickname. Try again', e: err });
+      .send({ error: 'Issue by getting your nickname. Try again', e: error });
   }
 });
 
-// Generate ping pong result
+// // Generate ping pong result
 // router.get('/ping-pong/', (req, res) => {
 //   try {
 //     const numbers = [

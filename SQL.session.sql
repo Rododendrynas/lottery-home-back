@@ -1,6 +1,6 @@
-CREATE TABLE users (
+CREATE TABLE lucky_numbers (
     id INT AUTO_INCREMENT PRIMARY KEY,
-	nickname VARCHAR(255) UNIQUE,
-    email VARCHAR(255) UNIQUE,
-    `password` VARCHAR(255),
-    reg_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+	user_id INT,
+    numbers VARCHAR(255),
+    reg_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id))

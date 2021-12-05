@@ -20,10 +20,9 @@ Download the code:
 
 Create your own .env file using .env.example file structure for your own database. This project uses MySQL syntax.
 
-Run
-
 ```sh
 npm run start
+
 ```
 
 ## Author
@@ -43,3 +42,7 @@ Give a ⭐️ if this project helped you!
 ---
 
 _This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
+
+```
+
+```

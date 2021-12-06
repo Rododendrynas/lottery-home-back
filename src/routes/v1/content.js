@@ -105,6 +105,7 @@ router.delete('/account/:id', isLoggedIn, async (req, res) => {
 router.put('/account/:id', isLoggedIn, async (req, res) => {
   const { id } = req.params;
   let { nickname } = req.body;
+  console.log(nickname);
 
   try {
     nickname = await nicknameSchema.validateAsync(req.body);
@@ -124,6 +125,11 @@ router.put('/account/:id', isLoggedIn, async (req, res) => {
       .status(200)
       .send({ msg: `Nickname was updated to ${nickname.nickname}` });
   } catch (error) {
+    if (error.errno === 1062) {
+      return res
+        .status(200)
+        .send({ error: 'Email or nickname is used, please choose another' });
+    }
     return res.status(500).send({
       error: 'Issue by updating your nickname. Try again.',
       e: error,

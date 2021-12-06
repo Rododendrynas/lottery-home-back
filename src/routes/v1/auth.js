@@ -46,6 +46,11 @@ router.post('/register', async (req, res) => {
     return res.status(200).send({ ...data, msg: 'Registered' });
   } catch (err) {
     console.log(err);
+    if (err.errno === 1062) {
+      return res
+        .status(200)
+        .send({ err: 'Email or nickname is used, please choose another' });
+    }
     return res
       .status(500)
       .send({ err: 'Issue during registration. Try again' });

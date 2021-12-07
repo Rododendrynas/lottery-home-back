@@ -91,8 +91,8 @@ router.post('/login/', async (req, res) => {
       return res.status(401).send({ err: 'Incorrect email or password' });
     }
 
-    jwt.sign({ id: data[0].id, email: data[0].email }, jwtSecret);
-    return res.status(201).send({ msg: 'Successfully logged in' });
+    const token = jwt.sign({ id: data[0].id, email: data[0].email }, jwtSecret);
+    return res.status(201).send({ msg: 'Successfully logged in', token });
   } catch (error) {
     return res.status(500).send({ error: 'Incorrect data. Try again' });
   }

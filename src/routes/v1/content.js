@@ -56,6 +56,14 @@ router.post('/pingpong/:count/:range/', isLoggedIn, async (req, res) => {
     Number(num5),
   ];
 
+  for (let i = 0; i < userNumbers.length; i++) {
+    if (userNumbers[i] < 1 || userNumbers[i] > range) {
+      return res.status(400).send({
+        error: `Enter your numbers in the range from 1 to ${range}`,
+      });
+    }
+  }
+
   let randomNumbers = [];
   let matches = [];
   let isWinner = false;

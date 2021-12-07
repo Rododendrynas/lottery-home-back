@@ -22,7 +22,7 @@ const logUserSchema = Joi.object({
 });
 
 // Register
-router.post('/register', async (req, res) => {
+router.post('/register/', async (req, res) => {
   let userDetails = req.body;
   console.log(userDetails);
   try {
@@ -58,7 +58,7 @@ router.post('/register', async (req, res) => {
 });
 
 // Login
-router.post('/login', async (req, res) => {
+router.post('/login/', async (req, res) => {
   let userDetails = req.body;
 
   try {
@@ -91,8 +91,8 @@ router.post('/login', async (req, res) => {
       return res.status(401).send({ err: 'Incorrect email or password' });
     }
 
-    const token = jwt.sign({ id: data[0].id, email: data[0].email }, jwtSecret);
-    return res.status(201).send({ msg: 'Successfully logged in', token });
+    jwt.sign({ id: data[0].id, email: data[0].email }, jwtSecret);
+    return res.status(201).send({ msg: 'Successfully logged in' });
   } catch (error) {
     return res.status(500).send({ error: 'Incorrect data. Try again' });
   }

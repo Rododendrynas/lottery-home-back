@@ -27,9 +27,9 @@ router.post('/register', async (req, res) => {
   console.log(userDetails);
   try {
     userDetails = await regUserSchema.validateAsync(userDetails);
-  } catch (err) {
-    console.log(err);
-    return res.status(400).send({ err: 'Incorrect data.' });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send({ error: 'Incorrect data.' });
   }
 
   try {
@@ -44,16 +44,16 @@ router.post('/register', async (req, res) => {
     await con.end();
     console.log(data);
     return res.status(200).send({ ...data, msg: 'Registered' });
-  } catch (err) {
-    console.log(err);
-    if (err.errno === 1062) {
+  } catch (error) {
+    console.log(error);
+    if (error.errno === 1062) {
       return res
         .status(200)
-        .send({ err: 'Email or nickname is used, please choose another' });
+        .send({ error: 'Email or nickname is used, please choose another' });
     }
     return res
       .status(500)
-      .send({ err: 'Issue during registration. Try again' });
+      .send({ error: 'Issue during registration. Try again' });
   }
 });
 
@@ -63,9 +63,9 @@ router.post('/login', async (req, res) => {
 
   try {
     userDetails = await logUserSchema.validateAsync(userDetails);
-  } catch (err) {
-    console.log(err);
-    return res.status(400).send({ err: 'Incorrect email or password' });
+  } catch (error) {
+    console.log(error);
+    return res.status(400).send({ error: 'Incorrect email or password' });
   }
 
   try {
@@ -79,7 +79,7 @@ router.post('/login', async (req, res) => {
     await con.end();
 
     if (data.length === 0) {
-      return res.status(400).send({ err: 'Incorrect email or password' });
+      return res.status(400).send({ error: 'Incorrect email or password' });
     }
 
     const isAuthorized = await bcrypt.compareSync(
@@ -93,8 +93,8 @@ router.post('/login', async (req, res) => {
 
     const token = jwt.sign({ id: data[0].id, email: data[0].email }, jwtSecret);
     return res.status(201).send({ msg: 'Successfully logged in', token });
-  } catch (err) {
-    return res.status(500).send({ err: 'Incorrect data. Try again' });
+  } catch (error) {
+    return res.status(500).send({ error: 'Incorrect data. Try again' });
   }
 });
 

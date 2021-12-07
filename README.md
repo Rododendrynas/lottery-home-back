@@ -4,6 +4,10 @@
 
 > The main axis of this project - lottery games: Dice game, Ping Pong game. Other functionalities around them: registration/login with authorization and a simple account management.
 
+> Dice game: 'roll' a dice three times. Numbers from 1 to 6 are possible. You winn if all three dices show the same numbers.
+
+> Ping Pong game: enter five your own numbers, click a button and the app will generate 5 random numbers for you. Numbers from 1 to 45 are possible. You winn if at least one match exists.
+
 ## Install
 
 ```sh
